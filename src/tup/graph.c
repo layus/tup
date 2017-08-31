@@ -882,6 +882,7 @@ static tupid_t command_outgoing_hash(tupid_t hash, struct node *n)
 		}
 	}
 
+	/*
 	LIST_FOREACH(e, &n->edges, list) {
 		LIST_FOREACH(e2, &e->dest->edges, list) {
 			if(e2->dest->tent->type == TUP_NODE_CMD) {
@@ -889,6 +890,7 @@ static tupid_t command_outgoing_hash(tupid_t hash, struct node *n)
 			}
 		}
 	}
+	*/
 	free_string_tree(&root);
 	return hash;
 }
@@ -907,6 +909,7 @@ static tupid_t command_incoming_hash(tupid_t hash, struct node *n)
 		}
 	}
 
+	/*
 	LIST_FOREACH(e, &n->incoming, destlist) {
 		LIST_FOREACH(e2, &e->src->incoming, destlist) {
 			if(e2->src->tent->type == TUP_NODE_CMD) {
@@ -914,6 +917,7 @@ static tupid_t command_incoming_hash(tupid_t hash, struct node *n)
 			}
 		}
 	}
+	*/
 
 	free_string_tree(&root);
 	return hash;
