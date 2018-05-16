@@ -813,18 +813,13 @@ static tupid_t get_hash(tupid_t hash, tupid_t id, int style)
 	return hash * 31 + (id * style);
 }
 
-static tupid_t command_name_hash(tupid_t hash, struct tup_entry *tent,
-				 struct string_entries *root, int mult)
+static char* command_name(struct tup_entry* tent)
 {
 	const char *name;
+	char *short_name;
 	const char *space;
 	int len;
-	int x;
 
-	/* Hash the command string up to the first
-	 * space, so eg: all "gcc" commands can
-	 * potentially be joined.
-	 */
 	name = tent->display;
 	if(!name)
 		name = tent->name.s;
@@ -835,6 +830,30 @@ static tupid_t command_name_hash(tupid_t hash, struct tup_entry *tent,
 		len = strlen(name);
 	}
 
+	short_name = malloc(len + 1);
+	if (!short_name) {
+		perror("malloc");
+		return NULL;
+	}
+	strncpy(short_name, name, len);
+	short_name[len] = 0;
+
+	return short_name;
+}
+
+static tupid_t command_name_hash(tupid_t hash, struct tup_entry *tent,
+				 struct string_entries *root, int mult)
+{
+	const char *name;
+	int len;
+
+	/* Hash the command string up to the first
+	 * space, so eg: all "gcc" commands can
+	 * potentially be joined.
+	 */
+	name = command_name(tent);
+	len = strlen(name);
+
 	if(root) {
 		struct string_tree *st;
 		if(string_tree_search(root, name, len) != NULL)
@@ -844,17 +863,15 @@ static tupid_t command_name_hash(tupid_t hash, struct tup_entry *tent,
 			perror("malloc");
 			return -1;
 		}
-		st->s = malloc(len + 1);
-		strncpy(st->s, name, len);
-		st->s[len] = 0;
+		st->s = strdup(name);
 		st->len = len;
 		if(string_tree_insert(root, st) < 0)
 			return -1;
 	}
 
-	for(x=0; x<len; x++) {
-		hash = get_hash(hash, name[x], mult);
-	}
+	hash = hash_string(hash, name, len, mult);
+
+	free(name);
 	return hash;
 }
 
