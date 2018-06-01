@@ -65,6 +65,7 @@ struct node *create_node(struct graph *g, struct tup_entry *tent)
 	n->parsing = 0;
 	n->marked = 0;
 	n->skip = 1;
+	n->depth = 0;
 	TAILQ_INSERT_TAIL(&g->node_list, n, list);
 
 	if(tupid_tree_insert(&g->node_root, &n->tnode) < 0)
@@ -1012,6 +1013,7 @@ static tupid_t command_depth(struct node *n)
 	struct edge *e;
 	struct edge *e2;
 	tupid_t max = 0, depth;
+	if (n->depth != 0) return n->depth;
 
 	LIST_FOREACH(e, &n->edges, list) {
 		LIST_FOREACH(e2, &e->dest->edges, list) {
@@ -1021,8 +1023,9 @@ static tupid_t command_depth(struct node *n)
 			}
 		}
 	}
+	n->depth = max;
 
-	return max;
+	return n->depth;
 }
 static tupid_t file_height(struct node *n);
 static tupid_t command_height(struct node *n)

@@ -57,6 +57,8 @@ struct node {
 	unsigned char parsing;
 	unsigned char marked;
 	unsigned char skip;
+
+	unsigned int depth;
 };
 TAILQ_HEAD(node_head, node);
 
